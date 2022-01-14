@@ -1,0 +1,27 @@
+{
+  "name": "interactive-comments",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite --port=3002",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.7.1",
+    "clsx": "^1.1.1",
+    "dayjs": "^1.10.7",
+    "firebase": "^9.6.1",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "react-redux": "^8.0.2",
+    "uuid": "^8.3.2",
+    "uuidv4": "^6.2.12"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.9",
+    "@types/react-dom": "^18.0.4",
+    "@vitejs/plugin-react": "^1.0.7",
+    "typescript": "^4.4.4",
+    "vite": "^2.7.2"
+  }
+}
