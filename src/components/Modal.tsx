@@ -1,4 +1,12 @@
-export const Modal = ({ headerText, bodyText, children }: any) => {
+import { ReactChild, ReactChildren } from "react";
+
+type ModalProps = {
+  headerText: string;
+  bodyText: string;
+  children?: JSX.Element | JSX.Element[];
+};
+
+export const Modal = ({ headerText, bodyText, children }: ModalProps) => {
   return (
     <>
       <div className="modal">

@@ -4,45 +4,53 @@ import { addReply } from "../features/replies/repliesSlice";
 import { selectUser } from "../features/user/userSlice";
 import { updateReply, deleteReply } from "../features/replies/repliesSlice";
 
-import DeleteIcon from "../images/icon-delete.svg";
-import EditIcon from "../images/icon-edit.svg";
-import ReplyIcon from "../images/icon-reply.svg";
-
 import { Score } from "./Score";
-import { Button } from "./Button";
 import { Modal } from "./Modal";
 import { Textarea } from "./Textarea";
+import { Text } from "./Text";
+import { HeaderActions } from "./HeaderActions";
+import { UserToolbar } from "./UserToolbar";
+
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { isCurrentUser } from "../utils/isCurrentUser";
+import { Button } from "./Button";
+dayjs.extend(relativeTime);
 
 export const Reply = ({ reply, commentId }: any) => {
   const dispatch = useDispatch();
 
+  const { id, hasVoted, score, user, content, createdAt, replyingTo } = reply;
+  const { username } = user;
+
   // Get current user
   const currentUser = useSelector(selectUser);
-  const isCurrentUser = currentUser.username === reply.user.username;
 
   // Set visible mode Modal and set props
-  const [modalProps, setModalProps] = useState({
+  const [modalProps, setModalProps] = useState<any>({
     header: "",
     text: "",
-    confirmMessage: "",
+    message: "",
+    cancelButtonVisibility: true,
     cancel: () => {},
     confirm: () => {},
   });
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   // Update Reply
-  const [isEditable, setIsEditable] = useState(false);
-  const [updatedText, setUpdatedText] = useState("");
+  const [isEditable, setIsEditable] = useState<boolean>(false);
+  const [updatedText, setUpdatedText] = useState<string>("");
   const editReply = () => {
-    setIsEditable(true);
-    setUpdatedText(reply.content);
+    setIsEditable(!isEditable);
+    setUpdatedText(content);
   };
 
   const handleUpdateReply = () => {
     setModalProps({
       header: "Update Reply",
       text: "Are you sure you want to update this reply?",
-      confirmMessage: "Yes, update",
+      message: "Yes, update",
+      cancelButtonVisibility: true,
       cancel: onCancelUpdateReply,
       confirm: confirmUpdateReply,
     });
@@ -50,7 +58,6 @@ export const Reply = ({ reply, commentId }: any) => {
   };
 
   const confirmUpdateReply = () => {
-    const { id } = reply;
     dispatch(updateReply({ id, content: updatedText }));
     setIsEditable(false);
     setIsVisible(false);
@@ -66,7 +73,8 @@ export const Reply = ({ reply, commentId }: any) => {
     setModalProps({
       header: "Delete Reply",
       text: "Are you sure you want to delete this reply? This will remove the reply and can’t be undone.",
-      confirmMessage: "Yes, delete",
+      message: "Yes, delete",
+      cancelButtonVisibility: true,
       cancel: () => setIsVisible(false),
       confirm: confirmDeleteReply,
     });
@@ -79,18 +87,30 @@ export const Reply = ({ reply, commentId }: any) => {
   };
 
   // ReplyTo
-  const [isRepliyng, setIsReplying] = useState(false);
-  const [replyText, setReplyText] = useState("");
+  const [isReplying, setIsReplying] = useState<boolean>(false);
+  const [replyText, setReplyText] = useState<string>("");
 
-  const replyTo = () => setIsReplying(true);
+  const replyTo = () => setIsReplying(!isReplying);
 
-  const handleReplyReply = () => {
+  const confirmReply = () => {
     setModalProps({
       header: "Confirm",
-      text: "Are you sure you want to reply to this reply?",
-      confirmMessage: "Yes",
-      cancel: () => setIsVisible(false),
+      text: "Are you sure you want to reply?",
+      message: "Yes",
+      cancelButtonVisibility: true,
+      cancel: resetStatusReply,
       confirm: submitReply,
+    });
+    setIsVisible(true);
+  };
+  const alertMention = () => {
+    setModalProps({
+      header: "Oops!",
+      text: `You can't reply without mentionning @${username}`,
+      message: "Ok",
+      cancelButtonVisibility: false,
+      cancel: () => setIsVisible(false),
+      confirm: () => setIsVisible(false),
     });
     setIsVisible(true);
   };
@@ -100,18 +120,20 @@ export const Reply = ({ reply, commentId }: any) => {
       content: replyText,
       user: currentUser,
       commentId: commentId,
-      replyingTo: reply.user.username,
+      replyingTo: username,
     };
     if (replyText !== "") {
       dispatch(addReply(newReply));
       setReplyText("");
     }
+    resetStatusReply();
+  };
+
+  const resetStatusReply = () => {
     setIsReplying(false);
     setIsVisible(false);
   };
 
-  const { id, hasVoted, score, user, content } = reply;
-  const { username } = user;
   return (
     <>
       <li className="item" data-id={id}>
@@ -120,77 +142,61 @@ export const Reply = ({ reply, commentId }: any) => {
             id={id}
             hasVoted={hasVoted}
             score={score}
-            isCurrentUser={isCurrentUser}
+            isCurrentUser={isCurrentUser(currentUser, username)}
             type="reply"
           />
           <div className="comment">
             <header className="header">
               <div className="toolbar">
-                <div className="user">
-                  <figure className="avatar">
-                    <img
-                      src={`src/images/avatars/image-${username}.webp`}
-                      alt={username}
-                    />
-                  </figure>
-                  <span>{username}</span>
-                  {isCurrentUser && <span className="current-user">you</span>}
-                </div>
-                <time className="date">2 weeks ago</time>
+                <UserToolbar
+                  username={username}
+                  isCurrentUser={isCurrentUser(currentUser, username)}
+                />
+                <time className="date">{dayjs(createdAt).fromNow()}</time>
               </div>
-              {isCurrentUser && (
-                <div className="user-actions">
-                  <button className="delete" onClick={handleDeleteReply}>
-                    <img src={DeleteIcon} alt="reply to" /> Delete
-                  </button>
-                  <button className="edit" onClick={editReply}>
-                    <img src={EditIcon} alt="reply to" /> Edit
-                  </button>
-                </div>
-              )}
-              {!isCurrentUser && (
-                <button className="reply" onClick={replyTo}>
-                  <img src={ReplyIcon} alt="reply to" /> Reply
-                </button>
-              )}
+              <HeaderActions
+                isCurrentUser={isCurrentUser(currentUser, username)}
+                deleteText={handleDeleteReply}
+                editText={editReply}
+                replyTo={replyTo}
+              />
             </header>
-            {!isEditable ? (
-              <p className={isEditable ? "textarea" : ""}>{content}</p>
-            ) : (
-              <div className="edit-comment mt-20">
-                <textarea
-                  className={isEditable ? "textarea" : ""}
-                  value={updatedText}
-                  onChange={e => setUpdatedText(e.target.value)}
-                ></textarea>
-                <Button text="Update" onClick={handleUpdateReply} />
-              </div>
-            )}
+            <Text
+              isEditable={isEditable}
+              replyingTo={replyingTo}
+              content={content}
+              updatedText={updatedText}
+              setUpdatedText={setUpdatedText}
+              onClick={handleUpdateReply}
+            />
           </div>
         </div>
 
-        {isRepliyng && (
+        {isReplying && (
           <Textarea
             username={username}
-            isRepliyng={isRepliyng}
-            getText={setReplyText}
-            onClick={handleReplyReply}
+            isReplying={isReplying}
+            setCommentText={setReplyText}
+            alertMention={alertMention}
+            onClick={confirmReply}
           />
         )}
       </li>
 
       {isVisible && (
-        <Modal
-          headerText={modalProps.header}
-          bodyText={modalProps.text}
-          setIsVisible={setIsVisible}
-        >
-          <button className="button cancel" onClick={modalProps.cancel}>
-            No, cancel
-          </button>
-          <button className="button confirm" onClick={modalProps.confirm}>
-            {modalProps.confirmMessage}
-          </button>
+        <Modal headerText={modalProps.header} bodyText={modalProps.text}>
+          {modalProps.cancelButtonVisibility && (
+            <Button
+              onClick={modalProps.cancel}
+              buttonClass="cancel"
+              text="No, cancel"
+            />
+          )}
+          <Button
+            onClick={modalProps.confirm}
+            buttonClass="confirm"
+            text={modalProps.message}
+          />
         </Modal>
       )}
     </>

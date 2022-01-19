@@ -1,8 +1,12 @@
-import { useState } from "react";
+type ButtonProps = {
+  text: string;
+  buttonClass: string;
+  onClick: () => void;
+};
 
-export const Button = ({ text, onClick }: any) => {
+export const Button = ({ text, buttonClass, onClick }: ButtonProps) => {
   return (
-    <button id="send" className="button submit" onClick={onClick}>
+    <button className={`button ${buttonClass}`} onClick={onClick}>
       {text}
     </button>
   );

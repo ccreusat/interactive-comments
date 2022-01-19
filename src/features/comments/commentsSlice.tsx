@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
-import { selectUser } from "../user/userSlice";
-import { useSelector } from "react-redux";
+
+const now = new Date();
 
 const options = {
   name: "comments",
@@ -11,7 +11,7 @@ const options = {
         id: 1,
         content:
           "Impressive! Though it seems the drag feature could be improved. But overall it looks incredible. You've nailed the design and the responsiveness at various breakpoints works really well.",
-        createdAt: "1 month ago",
+        createdAt: now.getTime() - 12096e5,
         score: 12,
         hasVoted: false,
         user: {
@@ -26,7 +26,7 @@ const options = {
         id: 2,
         content:
           "Woah, your project looks awesome! How long have you been coding for? I'm still new, but think I want to dive into React as well soon. Perhaps you can give me an insight on where I can learn React? Thanks!",
-        createdAt: "1 month ago",
+        createdAt: now.getTime() - 5184e5,
         score: 5,
         hasVoted: false,
         user: {
@@ -42,10 +42,12 @@ const options = {
   reducers: {
     addComment: (state: any, action: any) => {
       const { content, user } = action.payload;
+      const { comments } = state;
+
       const newComment = {
         id: uuidv4(),
         content: content,
-        createdAt: "today",
+        createdAt: now.getTime(),
         score: 0,
         user: {
           image: {
@@ -56,29 +58,30 @@ const options = {
         },
       };
       return {
-        comments: [...state.comments, newComment],
+        comments: [...comments, newComment],
       };
     },
     updateComment: (state: any, action: any) => {
       const { id, content } = action.payload;
+      const { comments } = state;
 
       return {
-        comments: state.comments.map((comment: any) =>
+        comments: comments.map((comment: any) =>
           comment.id === id ? { ...comment, content } : comment
         ),
       };
     },
     deleteComment: (state: any, action: any) => {
       const { id } = action.payload;
+      const { comments } = state;
 
       return {
-        comments: state.comments.filter((comment: any) => comment.id !== id),
+        comments: comments.filter((comment: any) => comment.id !== id),
       };
     },
     updateScore: (state: any, action: any) => {
       const { id, score } = action.payload;
-      console.log(id, score);
-
+      const { comments } = state;
       // UPDATE object, 1
       /* const index = state.comments.findIndex((comment:any) => comment.id === id);
             if (index !== -1) {
@@ -101,7 +104,7 @@ const options = {
 
       // UPDATE object, 3
       return {
-        comments: state.comments.map((comment: any) =>
+        comments: comments.map((comment: any) =>
           comment.id === id
             ? { ...comment, score: score, hasVoted: true }
             : comment
@@ -110,9 +113,10 @@ const options = {
     },
     incrementScore: (state: any, action: any) => {
       const { id, score } = action.payload;
-      console.log(id, score);
+      const { comments } = state;
+
       return {
-        comments: state.comments.map((comment: any) =>
+        comments: comments.map((comment: any) =>
           comment.id === id
             ? { ...comment, score: score + 1, hasVoted: true }
             : comment
@@ -121,11 +125,12 @@ const options = {
     },
     decrementScore: (state: any, action: any) => {
       const { id, score } = action.payload;
-      console.log(id, score);
+      const { comments } = state;
+
       return {
-        comments: state.comments.map((comment: any) =>
+        comments: comments.map((comment: any) =>
           comment.id === id
-            ? { ...comment, score: score + 1, hasVoted: true }
+            ? { ...comment, score: score - 1, hasVoted: true }
             : comment
         ),
       };

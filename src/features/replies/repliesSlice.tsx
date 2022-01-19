@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 
+const now = new Date();
+
 const options = {
   name: "replies",
   initialState: {
@@ -10,7 +12,7 @@ const options = {
         commentId: 2,
         content:
           "If you're still new, I'd recommend focusing on the fundamentals of HTML, CSS, and JS before considering React. It's very tempting to jump ahead but lay a solid foundation first.",
-        createdAt: "1 week ago",
+        createdAt: now.getTime() - 5184e5,
         score: 4,
         replyingTo: "maxblagun",
         user: {
@@ -26,7 +28,7 @@ const options = {
         commentId: 2,
         content:
           "I couldn't agree more with this. Everything moves so fast and it always seems like everyone knows the newest library/framework. But the fundamentals are what stay constant.",
-        createdAt: "2 days ago",
+        createdAt: now.getTime() - 5184e5,
         score: 2,
         replyingTo: "ramsesmiron",
         user: {
@@ -42,12 +44,13 @@ const options = {
   reducers: {
     addReply: (state: any, action: any) => {
       const { commentId, user, content, replyingTo } = action.payload;
+      const { replies } = state;
 
       const newReply = {
         id: uuidv4(),
         commentId,
-        content,
-        createdAt: "today",
+        content: content.replace("@" + replyingTo, ""),
+        createdAt: now.getTime(),
         score: 0,
         replyingTo,
         user: {
@@ -59,31 +62,48 @@ const options = {
         },
       };
       return {
-        replies: [...state.replies, newReply],
+        replies: [...replies, newReply],
       };
     },
     updateReply: (state: any, action: any) => {
       const { id, content } = action.payload;
+      const { replies } = state;
 
       return {
-        replies: state.replies.map((reply: any) =>
+        replies: replies.map((reply: any) =>
           reply.id === id ? { ...reply, content } : reply
         ),
       };
     },
     deleteReply: (state: any, action: any) => {
       const { id } = action.payload;
+      const { replies } = state;
 
       return {
-        replies: state.replies.filter((reply: any) => reply.id !== id),
+        replies: replies.filter((reply: any) => reply.id !== id),
       };
     },
-    updateReplyScore: (state: any, action: any) => {
+    incrementReplyScore: (state: any, action: any) => {
       const { id, score } = action.payload;
+      const { replies } = state;
 
       return {
-        replies: state.replies.map((reply: any) =>
-          reply.id === id ? { ...reply, score: score, hasVoted: true } : reply
+        replies: replies.map((reply: any) =>
+          reply.id === id
+            ? { ...reply, score: score + 1, hasVoted: true }
+            : reply
+        ),
+      };
+    },
+    decrementReplyScore: (state: any, action: any) => {
+      const { id, score } = action.payload;
+      const { replies } = state;
+
+      return {
+        replies: replies.map((reply: any) =>
+          reply.id === id
+            ? { ...reply, score: score - 1, hasVoted: true }
+            : reply
         ),
       };
     },
@@ -94,6 +114,11 @@ export const selectReplies = (state: any) => state.replies.replies;
 
 const repliesSlice = createSlice(options);
 
-export const { addReply, deleteReply, updateReply, updateReplyScore } =
-  repliesSlice.actions;
+export const {
+  addReply,
+  deleteReply,
+  updateReply,
+  incrementReplyScore,
+  decrementReplyScore,
+} = repliesSlice.actions;
 export default repliesSlice.reducer;

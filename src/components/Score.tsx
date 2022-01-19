@@ -6,25 +6,35 @@ import {
   incrementScore,
   decrementScore,
 } from "../features/comments/commentsSlice";
-// import { updateReplyScore } from "../features/replies/repliesSlice";
+import { incrementReplyScore,
+  decrementReplyScore, } from "../features/replies/repliesSlice";
 
-export const Score = ({ id, score, hasVoted, isCurrentUser }: any) => {
+export const Score = ({ id, score, hasVoted, isCurrentUser, type }: any) => {
   const dispatch = useDispatch();
 
   // Upvote / Downvote score
   const [count, setcount] = useState(score || 0);
   const increment = () => {
     setcount(count + 1);
-    dispatch(incrementScore({ id, score: count }));
+    if (type === "reply") {
+      dispatch(incrementReplyScore({ id, score: count }));
+    } else {
+      dispatch(incrementScore({ id, score: count }));
+    }
   };
   const decrement = () => {
     setcount(count - 1);
-    dispatch(decrementScore({ id, score: count }));
+    if (type === "reply") {
+      dispatch(decrementReplyScore({ id, score: count }))
+    } else {
+      dispatch(decrementScore({ id, score: count }));
+    }
   };
 
   // Logged User can't upvote - downvote his owns comments / replies
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
+  // If user has voted, disable possibility to upvote/downvote
   useEffect(() => {
     if (hasVoted) setIsDisabled(true);
   }, [hasVoted]);
