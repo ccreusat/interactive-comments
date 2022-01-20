@@ -114,7 +114,7 @@ const options = {
     incrementScore: (state: any, action: any) => {
       const { id, score } = action.payload;
       const { comments } = state;
-
+      
       return {
         comments: comments.map((comment: any) =>
           comment.id === id

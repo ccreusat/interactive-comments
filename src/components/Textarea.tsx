@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, memo, useCallback } from "react";
 import { Button } from "./Button";
 import { selectUser } from "../features/user/userSlice";
 import { useSelector } from "react-redux";
@@ -15,12 +15,21 @@ export const Textarea = memo(
     const handleChange = ({ target }: any) => {
       setText(target.value);
       setCommentText(target.value);
-      // console.log(target.value.includes(`@${username}`));
     };
     const handleOnClick = () => {
-      if (!text.includes(`@${username}`) || text === "") {
-        alertMention();
-      } else {
+      if (isReplying) {
+        if (!text.includes(`@${username}`) || text === "") {
+          alertMention();
+        } else {
+          onClick().then(()=> {
+            setText("");
+            setCommentText("");
+          });
+        }
+        
+      }
+      
+      if (!isReplying && text !== "") {
         onClick();
         setText("");
         setCommentText("");
@@ -33,7 +42,7 @@ export const Textarea = memo(
           <div className="user">
             <figure className="avatar">
               <img
-                src={`src/images/avatars/image-${currentUser.username}.webp`}
+                src={`./avatars/image-${currentUser.username}.webp`}
                 alt="username"
               />
             </figure>

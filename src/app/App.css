@@ -13,6 +13,7 @@
   --very-light-gray: #f5f6fa;
   --light-gray: #e9ebf0;
   --soft-red: #ed6368;
+  --pale-red: #FFB8BB;
 }
 
 html,
@@ -63,8 +64,14 @@ ul ul::before {
 }
 
 #root {
-  max-width: 730px;
-  margin: 64px auto;
+  margin: 32px 16px;
+}
+
+@media (min-width: 640px) {
+  #root {
+    max-width: 730px;
+    margin: 64px auto;
+  }
 }
 
 p {
@@ -93,7 +100,12 @@ p {
 }
 
 .button.submit {
+  transition: background 400ms cubic-bezier(0.165, 0.84, 0.44, 1);
   background-color: var(--moderate-blue);
+}
+
+.button.submit:hover {
+  background-color: var(--light-grayish-blue);
 }
 
 .button.cancel {
@@ -104,13 +116,23 @@ p {
   background-color: var(--soft-red);
 }
 
+.button.confirm:hover {
+  background-color: var(--pale-red);
+}
+
 .container {
   display: flex;
-  /* justify-content: space-between; */
+  flex-direction: column;
   gap: 24px;
   padding: 24px;
   border-radius: 8px;
   background-color: #fff;
+}
+
+@media (min-width: 640px) {
+  .container {
+    flex-direction: row;
+  }
 }
 
 .item + .item {
@@ -118,15 +140,28 @@ p {
 }
 
 .score {
+  order: 2;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  flex-direction: column;
-  width: 40px;
-  min-width: 40px;
-  height: 100px;
+  flex-direction: row;
+  width: 100px;
+  min-width: 100px;
+  height: 40px;
   border-radius: 10px;
   background-color: var(--very-light-gray);
+}
+
+@media (min-width: 640px) {
+  .score {
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    order: 1;
+    width: 40px;
+    min-width: 40px;
+    height: 100px;
+  }
 }
 
 .score.is-disabled {
@@ -138,14 +173,15 @@ p {
 }
 
 .score > * {
+  display: inline-flex;
   font-size: 16px;
   font-weight: 700;
   color: var(--moderate-blue);
 }
 
-.score span {
+/* .score span {
   height: 10px;
-}
+} */
 
 .score svg path {
   fill: var(--light-grayish-blue);
@@ -204,8 +240,23 @@ p {
   color: var(--moderate-blue);
 }
 
+.reply:hover,
+.edit:hover {
+  color: var(--light-grayish-blue);
+}
+
+.reply:hover > img,
+.edit:hover > img,
+.delete:hover > img {
+  opacity: .5;
+}
+
 .delete {
   color: var(--soft-red);
+}
+
+.delete:hover {
+  color: var(--pale-red);
 }
 
 .toolbar {

@@ -18,30 +18,23 @@ export const Score = ({ id, score, hasVoted, isCurrentUser, type }: any) => {
     setcount(count + 1);
     if (type === "reply") {
       dispatch(incrementReplyScore({ id, score: count }));
-    } else {
-      dispatch(incrementScore({ id, score: count }));
     }
+    dispatch(incrementScore({ id, score: count }));
   };
   const decrement = () => {
     setcount(count - 1);
     if (type === "reply") {
       dispatch(decrementReplyScore({ id, score: count }))
-    } else {
-      dispatch(decrementScore({ id, score: count }));
     }
+    dispatch(decrementScore({ id, score: count }));
   };
 
   // Logged User can't upvote - downvote his owns comments / replies
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
   // If user has voted, disable possibility to upvote/downvote
-  useEffect(() => {
-    if (hasVoted) setIsDisabled(true);
-  }, [hasVoted]);
-
-  useEffect(() => {
-    setIsDisabled(isCurrentUser);
-  }, [isCurrentUser]);
+  useEffect(() => hasVoted && setIsDisabled(true), [hasVoted]);
+  useEffect(() => setIsDisabled(isCurrentUser), [isCurrentUser]);
 
   return (
     <div className={`score ${isDisabled ? "is-disabled" : ""}`}>

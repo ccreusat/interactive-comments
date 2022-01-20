@@ -29,7 +29,7 @@ export const Text = ({
         value={updatedText}
         onChange={e => setUpdatedText(e.target.value)}
       ></textarea>
-      <Button text="Update" onClick={onClick} />
+      <Button text="Update" buttonClass="submit" onClick={onClick} />
     </div>
   );
 };
