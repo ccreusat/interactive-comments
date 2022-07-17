@@ -13,7 +13,7 @@
   --very-light-gray: #f5f6fa;
   --light-gray: #e9ebf0;
   --soft-red: #ed6368;
-  --pale-red: #FFB8BB;
+  --pale-red: #ffb8bb;
 }
 
 html,
@@ -135,6 +135,7 @@ p {
   display: grid;
   /* flex-direction: column; */
   gap: 24px;
+  grid-template-columns: 4rem auto;
   row-gap: 16px;
   padding: 24px;
   border-radius: 8px;
@@ -155,16 +156,16 @@ p {
   .container.grid {
     display: grid;
   }
-  
+
   .container.grid .user {
     grid-row-start: 2;
   }
-  
+
   .container.grid .textarea {
     grid-column-start: 1;
     grid-column-end: 4;
   }
-  
+
   .container.grid .button {
     grid-row-start: 2;
     grid-column-start: 3;
@@ -296,7 +297,7 @@ p {
 .reply:hover > img,
 .edit:hover > img,
 .delete:hover > img {
-  opacity: .5;
+  opacity: 0.5;
 }
 
 .delete {
@@ -393,4 +394,14 @@ textarea,
   background: #000;
   opacity: 0.5;
   z-index: 1;
+}
+
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }

@@ -1,9 +1,20 @@
-import { useState, useEffect, useCallback } from "react";
+import { useReducer } from "react";
 
-export const useCounter = (score: number) => {
-  // Upvote / Downvote score
-  const [count, setcount] = useState(score || 0);
-  const increment = useCallback(() => setcount(count + 1), [count]);
-  const decrement = useCallback(() => setcount(count - 1), [count]);
-  return { count, increment, decrement };
-};
+const initialState = 0;
+
+function reducer(state: number, action: string) {
+  switch (action) {
+    case "increment": {
+      return state + 1;
+    }
+    case "decrement": {
+      return state - 1;
+    }
+    default:
+      throw new Error();
+  }
+}
+
+export default function useCounter(score: number) {
+  return useReducer(reducer, score || initialState);
+}

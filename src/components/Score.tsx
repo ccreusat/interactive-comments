@@ -1,68 +1,44 @@
 import { useState } from "react";
+import clsx from "clsx";
+
 import UpVote from "../images/icon-plus.svg";
 import DownVote from "../images/icon-minus.svg";
-import { useDispatch } from "react-redux";
-import {
-  incrementScore,
-  decrementScore,
-} from "../features/comments/commentsSlice";
-import {
-  incrementReplyScore,
-  decrementReplyScore,
-} from "../features/replies/repliesSlice";
-import { useCounter } from "../hooks/useCounter";
+import useCounter from "../hooks/useCounter";
 import { useDisabled } from "../hooks/useDisabled";
 
-export const Score = ({ id, score, hasVoted, isCurrentUser, type }: any) => {
-  const dispatch = useDispatch();
-  const [toggleVote, setToggleVote] = useState<boolean>(hasVoted);
-  const { isDisabled: voteDisabled } = useDisabled(hasVoted);
+interface ScoreProps {
+  score: number;
+  isCurrentUser: boolean;
+}
+
+export const Score = ({ score, isCurrentUser }: ScoreProps) => {
+  // initial value with score prop
+  const [counter, dispatch] = useCounter(score);
+
+  const [vote, setVote] = useState<boolean>(false);
+  const { isDisabled: voteDisabled } = useDisabled(false);
   const { isDisabled: currentUserDisabled } = useDisabled(isCurrentUser);
 
-  const {
-    count: commentCount,
-    increment: incrementComment,
-    decrement: decrementComment,
-  } = useCounter(score);
+  const classnames = clsx("score", {
+    "is-disabled": currentUserDisabled || voteDisabled || vote,
+  });
 
-  const {
-    count: replyCount,
-    increment: incrementReply,
-    decrement: decrementReply,
-  } = useCounter(score);
+  function upVote() {
+    dispatch("increment");
+    setVote(true);
+  }
 
-  const handleUpvoteComment = () => {
-    if (type === "reply") {
-      incrementComment();
-      dispatch(incrementReplyScore({ id, score: replyCount }));
-    } else {
-      incrementReply();
-      dispatch(incrementScore({ id, score: commentCount }));
-    }
-    setToggleVote(true);
-  };
-  const handleDownvoteComment = () => {
-    if (type === "reply") {
-      decrementReply();
-      dispatch(decrementReplyScore({ id, score: replyCount }));
-    } else {
-      decrementComment();
-      dispatch(decrementScore({ id, score: commentCount }));
-    }
-    setToggleVote(true);
-  };
-
+  function downVote() {
+    dispatch("decrement");
+    setVote(true);
+  }
   return (
-    <div
-      className={`score ${
-        toggleVote || voteDisabled || currentUserDisabled ? "is-disabled" : ""
-      }`}
-    >
-      <button onClick={handleUpvoteComment} disabled={voteDisabled}>
+    <div className={classnames}>
+      <button onClick={upVote} disabled={voteDisabled}>
         <img src={UpVote} alt="reply to" />
       </button>
-      <span>{score}</span>
-      <button onClick={handleDownvoteComment} disabled={voteDisabled}>
+      <span>{counter}</span>
+      <button onClick={downVote} disabled={voteDisabled}>
         <img src={DownVote} alt="reply to" />
       </button>
     </div>

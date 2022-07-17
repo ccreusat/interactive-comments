@@ -6,7 +6,7 @@ import { updateReply, deleteReply } from "../features/replies/repliesSlice";
 
 import { Score } from "./Score";
 import { Modal } from "./Modal";
-import { Textarea } from "./Textarea";
+import { Textarea } from "./AddComment";
 import { Text } from "./Text";
 import { HeaderActions } from "./HeaderActions";
 import { UserToolbar } from "./UserToolbar";

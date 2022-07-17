@@ -1,41 +1,51 @@
+import React, { useState } from "react";
 import { Button } from "./Button";
 
 type TextProps = {
-  isEditable: boolean;
-  replyingTo?: string;
+  id: string;
   content: string;
-  updatedText: string;
-  setUpdatedText: (target: any) => void;
-  onClick: () => void;
+  status: string;
+  onEditingStatus: () => void;
+  onEditComment: (id: string, content: string) => void;
 };
 
 export const Text = ({
-  isEditable,
-  replyingTo,
   content,
-  updatedText,
-  setUpdatedText,
-  onClick,
+  id,
+  status,
+  onEditingStatus,
+  onEditComment,
 }: TextProps) => {
+  const isEditing = status === "editing";
+  const [value, setValue] = useState(content);
+
+  function handleEditChange({
+    target: { value },
+  }: React.ChangeEvent<HTMLTextAreaElement>) {
+    setValue(value);
+  }
   return (
     <div className="comment">
-      {!isEditable ? (
-        <p>
-          {replyingTo && (
-            <strong className="replied">{`@${replyingTo}`}</strong>
-          )}{" "}
-          {content}
-        </p>
+      {!isEditing ? (
+        <p>{content}</p>
       ) : (
         <div className="edit-comment mt-20">
-          <label htmlFor="addComment">Add a new comment</label>
+          <label htmlFor="addComment" className="visually-hidden">
+            Add a new comment
+          </label>
           <textarea
             id="addComment"
-            className={isEditable ? "textarea" : ""}
-            value={updatedText}
-            onChange={e => setUpdatedText(e.target.value)}
+            className={isEditing ? "textarea" : ""}
+            value={value}
+            onChange={handleEditChange}
           ></textarea>
-          <Button buttonClass="submit" onClick={onClick}>
+          <Button
+            buttonClass="submit"
+            onClick={() => {
+              onEditComment(id, value);
+              onEditingStatus();
+            }}
+          >
             Update
           </Button>
         </div>
